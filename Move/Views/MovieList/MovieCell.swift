@@ -11,9 +11,11 @@ import Kingfisher
 
 class MovieCell: UITableViewCell {
     
+    
+    weak var parentViewController: UIViewController?
     private var isFavorited = false
     private var onFavoriteToggle: (() -> Void)?
-    
+
     
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
@@ -109,14 +111,71 @@ class MovieCell: UITableViewCell {
         
     }
     
+
     @objc private func favoriteButtonTapped() {
-        isFavorited.toggle()
-        updateFavoriteButton()
-        onFavoriteToggle?()
+        if isFavorited {
+            // ask for confirmation before unfavoriting
+            let alert = UIAlertController(title: "Remove Favorite", message: "Are you sure you want to remove this movie from favorites?", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "Remove", style: .destructive) { _ in
+                self.isFavorited.toggle()
+                self.updateFavoriteButton()
+                self.onFavoriteToggle?()
+            })
+            parentViewController?.present(alert, animated: true, completion: nil)
+        } else {
+            // add to favorites and show toast
+            isFavorited.toggle()
+            updateFavoriteButton()
+            onFavoriteToggle?()
+            showToast(message: "Added to Favorites")
+        }
     }
-    
-    
-    func configure(with movie: Movie, isFavorited: Bool, onFavoriteToggle: @escaping () -> Void) {
+    private func showToast(message: String) {
+        guard let parent = parentViewController else { return }
+
+        let toastLabel = UILabel()
+        toastLabel.text = message
+        toastLabel.textColor = .white
+        toastLabel.textAlignment = .center
+        toastLabel.backgroundColor = UIColor.gray.withAlphaComponent(0.7) //  رمادي شفاف
+        toastLabel.font = UIFont.systemFont(ofSize: 14)
+        toastLabel.numberOfLines = 0
+        toastLabel.alpha = 0.0
+        toastLabel.layer.cornerRadius = 10
+        toastLabel.clipsToBounds = true
+
+        let padding: CGFloat = 16
+        let textSize = toastLabel.intrinsicContentSize
+        let labelWidth = min(parent.view.frame.width - 2 * padding, textSize.width + 2 * padding)
+        let labelHeight = textSize.height + padding
+
+        toastLabel.frame = CGRect(
+            x: (parent.view.frame.width - labelWidth) / 2,
+            y: parent.view.frame.height - labelHeight - 80,
+            width: labelWidth,
+            height: labelHeight
+        )
+
+        parent.view.addSubview(toastLabel)
+
+        UIView.animate(withDuration: 0.5, animations: {
+            toastLabel.alpha = 1.0
+        }) { _ in
+            UIView.animate(withDuration: 0.5, delay: 1.5, options: .curveEaseOut, animations: {
+                toastLabel.alpha = 0.0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
+    }
+
+
+
+    func configure(with movie: Movie, isFavorited: Bool, parentVC: UIViewController, onFavoriteToggle: @escaping () -> Void)
+ {
+     self.parentViewController = parentVC
+
         titleLabel.text = movie.title
         releaseDateLabel.text = "Release: \(movie.releaseDate)"
         ratingLabel.text = String(format: "%.1f", movie.voteAverage)

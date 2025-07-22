@@ -32,6 +32,7 @@
 		EFA83C162E2F01ED00A9AB00 /* MockAPIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA83C152E2F01ED00A9AB00 /* MockAPIService.swift */; };
 		EFA83C182E2F025D00A9AB00 /* MockCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA83C172E2F025D00A9AB00 /* MockCacheManager.swift */; };
 		EFA83C1A2E2F02B100A9AB00 /* MovieListViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFA83C192E2F02B100A9AB00 /* MovieListViewModelTests.swift */; };
+		EFB32C962E30058000AE016F /* WelcomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFB32C952E30058000AE016F /* WelcomeViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -80,6 +81,7 @@
 		EFA83C152E2F01ED00A9AB00 /* MockAPIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockAPIService.swift; sourceTree = "<group>"; };
 		EFA83C172E2F025D00A9AB00 /* MockCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockCacheManager.swift; sourceTree = "<group>"; };
 		EFA83C192E2F02B100A9AB00 /* MovieListViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovieListViewModelTests.swift; sourceTree = "<group>"; };
+		EFB32C952E30058000AE016F /* WelcomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WelcomeViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,6 +223,7 @@
 		EF5A32532E2E8A3700827D9B /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				EFB32C942E30056500AE016F /* Home */,
 				EFA83C082E2EA99400A9AB00 /* MovieDetails */,
 				EF5A325A2E2E91A900827D9B /* MovieList */,
 			);
@@ -260,6 +263,14 @@
 				EFA83C0F2E2ECB5F00A9AB00 /* FavoriteManager.swift */,
 			);
 			path = Managers;
+			sourceTree = "<group>";
+		};
+		EFB32C942E30056500AE016F /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				EFB32C952E30058000AE016F /* WelcomeViewController.swift */,
+			);
+			path = Home;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -400,6 +411,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				EFA83C142E2EF35B00A9AB00 /* MovieCacheManagerProtocol.swift in Sources */,
+				EFB32C962E30058000AE016F /* WelcomeViewController.swift in Sources */,
 				EF5A32592E2E917C00827D9B /* MovieResponse.swift in Sources */,
 				EFA83C0D2E2EB02500A9AB00 /* MovieCacheManager.swift in Sources */,
 				EF5A32252E2E883100827D9B /* Move.xcdatamodeld in Sources */,

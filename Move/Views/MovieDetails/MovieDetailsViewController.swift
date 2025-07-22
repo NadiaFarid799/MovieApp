@@ -171,10 +171,65 @@ class MovieDetailsViewController: UIViewController {
         favoriteButton.setImage(UIImage(systemName: icon), for: .normal)
     }
 
+    
     @objc private func favoriteTapped() {
-        FavoriteManager.shared.toggleFavorite(movieID: movie.id)
-        updateFavoriteButton()
+        if isFavorited {
+            let alert = UIAlertController(
+                title: "Remove Favorite",
+                message: "Are you sure you want to remove this movie from favorites?",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+            alert.addAction(UIAlertAction(title: "Remove", style: .destructive) { [weak self] _ in
+                guard let self = self else { return }
+                FavoriteManager.shared.toggleFavorite(movieID: self.movie.id)
+                self.updateFavoriteButton()
+            })
+            present(alert, animated: true, completion: nil)
+        } else {
+            FavoriteManager.shared.toggleFavorite(movieID: movie.id)
+            updateFavoriteButton()
+            showToast(message: "Added to Favorites")
+        }
     }
+    private func showToast(message: String) {
+        let toastLabel = UILabel()
+        toastLabel.text = message
+        toastLabel.textColor = .white
+        toastLabel.textAlignment = .center
+        toastLabel.backgroundColor = UIColor.gray.withAlphaComponent(0.7) 
+        toastLabel.font = UIFont.systemFont(ofSize: 14)
+        toastLabel.numberOfLines = 0
+        toastLabel.alpha = 0.0
+        toastLabel.layer.cornerRadius = 10
+        toastLabel.clipsToBounds = true
+
+        let textSize = toastLabel.intrinsicContentSize
+        let padding: CGFloat = 16
+        let labelWidth = min(view.frame.width - 2 * padding, textSize.width + 2 * padding)
+        let labelHeight = textSize.height + padding
+
+        toastLabel.frame = CGRect(
+            x: (view.frame.width - labelWidth) / 2,
+            y: view.frame.height - labelHeight - 80,
+            width: labelWidth,
+            height: labelHeight
+        )
+
+        view.addSubview(toastLabel)
+
+        UIView.animate(withDuration: 0.5, animations: {
+            toastLabel.alpha = 1.0
+        }) { _ in
+            UIView.animate(withDuration: 0.5, delay: 1.5, options: .curveEaseOut, animations: {
+                toastLabel.alpha = 0.0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
+    }
+
+
 }
 
 

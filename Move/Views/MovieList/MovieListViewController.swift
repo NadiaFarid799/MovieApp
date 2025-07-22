@@ -12,7 +12,18 @@ import Combine
 class MovieListViewController: UIViewController {
 
     private let viewModel : MovieListViewModel
-    
+    private let tryAgainButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Try Again", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.backgroundColor = UIColor.gray
+        button.layer.cornerRadius = 8
+//        button.contentEdgeInsets = UIEdgeInsets(top: 10, left: 20, bottom: 10, right: 20)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.isHidden = true
+        return button
+    }()
+
     
     init(viewModel: MovieListViewModel = MovieListViewModel(
         apiService: APIService.shared,
@@ -31,6 +42,10 @@ class MovieListViewController: UIViewController {
     private let tableView = UITableView()
     private let activityIndicator = UIActivityIndicatorView(style: .large)
     private let errorLabel = UILabel()
+    @objc private func tryAgainTapped() {
+        tryAgainButton.isHidden = true
+        viewModel.fetchMovies()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,6 +57,13 @@ class MovieListViewController: UIViewController {
         setupErrorLabel()
         bindViewModel()
         viewModel.fetchMovies()
+        view.addSubview(tryAgainButton)
+        NSLayoutConstraint.activate([
+            tryAgainButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            tryAgainButton.topAnchor.constraint(equalTo: errorLabel.bottomAnchor, constant: 10)
+        ])
+        tryAgainButton.addTarget(self, action: #selector(tryAgainTapped), for: .touchUpInside)
+
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -72,6 +94,43 @@ class MovieListViewController: UIViewController {
             activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
+    private func showToast(message: String) {
+        let toastLabel = UILabel()
+        toastLabel.text = message
+        toastLabel.textColor = .white
+        toastLabel.textAlignment = .center
+        toastLabel.backgroundColor = UIColor.black.withAlphaComponent(0.7)
+        toastLabel.font = UIFont.systemFont(ofSize: 14)
+        toastLabel.numberOfLines = 0
+        toastLabel.alpha = 0.0
+        toastLabel.layer.cornerRadius = 10
+        toastLabel.clipsToBounds = true
+
+        let padding: CGFloat = 16
+        let maxWidth = view.frame.width - 2 * padding
+        let size = toastLabel.sizeThatFits(CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude))
+        let labelWidth = min(maxWidth, size.width + 2 * padding)
+        let labelHeight = size.height + padding
+
+        toastLabel.frame = CGRect(
+            x: (view.frame.width - labelWidth) / 2,
+            y: view.frame.height - labelHeight - 80,
+            width: labelWidth,
+            height: labelHeight
+        )
+
+        view.addSubview(toastLabel)
+
+        UIView.animate(withDuration: 0.5, animations: {
+            toastLabel.alpha = 1.0
+        }) { _ in
+            UIView.animate(withDuration: 0.5, delay: 1.5, options: .curveEaseOut, animations: {
+                toastLabel.alpha = 0.0
+            }) { _ in
+                toastLabel.removeFromSuperview()
+            }
+        }
+    }
 
     private func setupErrorLabel() {
         errorLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -97,11 +156,16 @@ class MovieListViewController: UIViewController {
                 self?.tableView.reloadData()
                 
                 if movies.isEmpty {
-                    self?.errorLabel.text = "No movies found."
-                    self?.errorLabel.isHidden = false
+                    if self?.viewModel.errorMessage == nil {
+                        self?.errorLabel.text = "No movies found."
+                        self?.errorLabel.isHidden = false
+                    } else {
+                        self?.errorLabel.isHidden = true
+                    }
                 } else {
                     self?.errorLabel.isHidden = true
                 }
+
             }
             .store(in: &cancellables)
 
@@ -116,12 +180,18 @@ class MovieListViewController: UIViewController {
         viewModel.$errorMessage
             .receive(on: DispatchQueue.main)
             .sink { [weak self] message in
-                self?.errorLabel.text = message
-                self?.errorLabel.isHidden = message == nil
+                if let message = message {
+                    self?.showToast(message: message)
+                    self?.tryAgainButton.isHidden = false
+                } else {
+                    self?.tryAgainButton.isHidden = true
+                }
             }
             .store(in: &cancellables)
+
     }
 }
+
 
 // MARK: - TableView
 
@@ -140,10 +210,13 @@ extension MovieListViewController: UITableViewDataSource, UITableViewDelegate {
         cell.configure(
             with: movie,
             isFavorited: FavoriteManager.shared.isFavorite(movieID: movie.id),
+            parentVC: self,
             onFavoriteToggle: { [weak self] in
                 FavoriteManager.shared.toggleFavorite(movieID: movie.id)
+                self?.tableView.reloadRows(at: [indexPath], with: .automatic)
             }
         )
+
         return cell
     }
 
