@@ -10,7 +10,7 @@ import Combine
 
 class APIService {
     static let shared = APIService()
-    private let apiKey = "908da20728829124674a4b28c563c160"
+    private let apiKey = "YOUR_API_KEY"
    
     func fetchTopMovies() -> AnyPublisher<[Movie], Error> {
         let urlString = "https://api.themoviedb.org/3/movie/top_rated?api_key=\(apiKey)&language=en-US&page=1"
