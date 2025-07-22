@@ -47,3 +47,13 @@ It showcases the use of **MVVM**, **Combine**, **caching**, and **clean code** p
 
 ```bash
 git clone [https://github.com/NadiaFarid799/MovieApp.git]
+this my video of movie app and some screens photo
+![Image](https://github.com/user-attachments/assets/c7a9bd2d-c115-4859-94fd-45fec9419fa8)
+
+![Image](https://github.com/user-attachments/assets/a6d1ca40-68ce-4f3c-ac64-94401865a8e5)
+
+![Image](https://github.com/user-attachments/assets/27ca866d-daa0-4dd2-a440-9bc4dfac0211)
+
+![Image](https://github.com/user-attachments/assets/ce54b186-9910-451b-957b-42ed52e8518e)
+
+https://github.com/user-attachments/assets/07fb3f9d-e31c-4959-b7f4-90d11eab33d5
